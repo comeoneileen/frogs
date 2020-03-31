@@ -596,13 +596,13 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.System.Cnds.OnLayoutStart,
 		C3.Plugins.Sprite.Acts.SetPosToObject,
 		C3.Behaviors.Pin.Acts.Pin,
+		C3.Plugins.System.Acts.SetVar,
 		C3.Plugins.Touch.Cnds.OnTapGestureObject,
 		C3.Plugins.Sprite.Cnds.PickTopBottom,
 		C3.Behaviors.MoveTo.Cnds.IsMoving,
 		C3.Plugins.System.Cnds.CompareVar,
 		C3.Plugins.Sprite.Cnds.IsAnimPlaying,
 		C3.Plugins.System.Acts.AddVar,
-		C3.Plugins.System.Acts.SetVar,
 		C3.Behaviors.MoveTo.Acts.MoveToPosition,
 		C3.Plugins.System.Cnds.Else,
 		C3.Behaviors.MoveTo.Cnds.OnArrived,
@@ -623,7 +623,8 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.System.Cnds.TriggerOnce,
 		C3.Plugins.Audio.Cnds.OnEnded,
 		C3.Plugins.System.Exps.int,
-		C3.Plugins.Audio.Acts.Play,
+		C3.Plugins.System.Acts.SetBoolVar,
+		C3.Plugins.Audio.Acts.PlayByName,
 		C3.Plugins.Audio.Acts.Stop,
 		C3.Plugins.Touch.Cnds.OnTouchEnd,
 		C3.Plugins.Touch.Cnds.OnTouchStart,
@@ -633,7 +634,9 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Sprite.Acts.SetOpacity,
 		C3.Plugins.Sprite.Exps.Opacity,
 		C3.Plugins.System.Cnds.PickByComparison,
-		C3.Plugins.System.Acts.Wait
+		C3.Plugins.System.Acts.Wait,
+		C3.Plugins.System.Cnds.EveryTick,
+		C3.Plugins.System.Cnds.CompareBoolVar
 	];
 };
 self.C3_JsPropNameTable = [
@@ -670,8 +673,11 @@ self.C3_JsPropNameTable = [
 	{Arrow: 0},
 	{sandwichLayers: 0},
 	{sandwichX: 0},
-	{correctSandwiches: 0},
-	{nextSquare: 0}
+	{nextSquare: 0},
+	{buzzSound: 0},
+	{ledOn: 0},
+	{buzzerOn: 0},
+	{coefficient: 0}
 ];
 
 "use strict";
@@ -772,6 +778,7 @@ self.C3_JsPropNameTable = [
 	self.C3_ExpressionFuncs = [
 		() => 1,
 		() => 2,
+		() => 0,
 		() => "copper",
 		() => "Top",
 		() => "towel",
@@ -795,6 +802,7 @@ self.C3_JsPropNameTable = [
 			return () => f0(50, 60);
 		},
 		() => "Squish2",
+		() => "squish",
 		p => {
 			const n0 = p._GetNode(0);
 			return () => n0.ExpObject_InstExpr(0);
@@ -807,19 +815,25 @@ self.C3_JsPropNameTable = [
 			const n3 = p._GetNode(3);
 			return () => C3.toDegrees(C3.angleTo(n0.ExpObject(), n1.ExpObject(), n2.ExpObject(), n3.ExpObject()));
 		},
-		() => 0,
 		() => "legsDrag",
 		() => 520,
-		() => "BUZZ",
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			const v1 = p._GetNode(1).GetVar();
-			return () => and("", f0((v1.GetValue() / 3)));
+			const v2 = p._GetNode(2).GetVar();
+			return () => and("", f0((v1.GetValue() / v2.GetValue())));
 		},
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			const v1 = p._GetNode(1).GetVar();
-			return () => and("On", f0((v1.GetValue() / 3)));
+			const v2 = p._GetNode(2).GetVar();
+			return () => and("On", f0((v1.GetValue() / v2.GetValue())));
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const v1 = p._GetNode(1).GetVar();
+			const v2 = p._GetNode(2).GetVar();
+			return () => and("buzz", f0((v1.GetValue() / v2.GetValue())));
 		},
 		() => "Off",
 		() => "Press",
@@ -833,7 +847,8 @@ self.C3_JsPropNameTable = [
 		p => {
 			const n0 = p._GetNode(0);
 			return () => n0.ExpInstVar();
-		}
+		},
+		() => 6
 	];
 }
 
